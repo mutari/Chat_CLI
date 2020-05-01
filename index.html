@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+
+        <main>
+
+            <div id="text">
+            </div>
+
+            <input type="text" id="input" placeholder="text...">
+
+        </main>
+
+    </body>
+
+    <script>
+
+        function makeid(length) {
+            var result           = '';
+            var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for ( var i = 0; i < length; i++ ) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+
+        function get() {
+            fetch('http://104.248.164.29/get?id=' + makeid(4))
+                .then(resp => resp.json())
+                .then(data => {
+
+                    var conv = document.getElementById('text');
+                    conv.innerHTML = "";
+
+                    data.forEach(element => {
+
+                        var text = document.createElement('p');
+                        text.innerHTML = `${element.user_name}: ${element.message}`;
+                        conv.appendChild(text);
+
+                    });
+
+
+                }).catch(err => {
+                    console.log(err);
+                });
+        }
+
+        var name = makeid(6);
+
+        get();
+
+        var input = document.getElementById("input");
+
+        input.addEventListener("keyup", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+
+                fetch(`http://104.248.164.29/push?user=${name}&message=${input.value}`)
+                    .then(() => {
+                        input.value = ""
+                        get();
+                    })
+
+            }
+        });
+
+    </script>
+
+    <style>
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body, html {
+            overflow: hidden;
+            display: flex;            
+            height: 100%;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            background: black;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }    
+
+        #text {
+            display: flex;
+            flex-direction: column;
+            flex: 8;
+            overflow: scroll;
+        }  
+
+        #input {
+            margin: 10px;
+            font-size: 30px;
+            flex: 1;
+            border: none;
+            border-bottom: solid black 1px;
+        }
+
+        input:focus {
+            outline:none;
+        }
+
+    </style>
+
+</html>
